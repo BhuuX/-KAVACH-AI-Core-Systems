@@ -1,18 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
-import { triggerRestore } from './db-wake.js';
+import catalystDb from './_utils/db.js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
-  {
-    global: {
-      fetch: async (url, options) => {
-        const res = await fetch(url, options);
-        if (!res.ok && res.status >= 500) triggerRestore();
-        return res;
-      },
-    },
-  }
-);
+// Natively and exclusively using Zoho Catalyst Data Store ZCQL builder.
+const dbClient = catalystDb;
 
-export default supabase;
+export default dbClient;

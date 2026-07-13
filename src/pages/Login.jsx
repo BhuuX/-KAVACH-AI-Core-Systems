@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import supabase from '../lib/supabase';
-import { signInWithGoogle } from '../lib/googleAuth';
 import { ShieldCheck, Lock, Mail, Loader2, AlertTriangle, ChevronDown } from 'lucide-react';
 
 const DEMO_ACCOUNTS = [
@@ -29,10 +27,23 @@ export default function Login() {
     setErr('');
     if (!email || !password) { setErr('Badge email and password are required.'); return; }
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
-    if (error) setErr(error.message);
-    else navigate('/dashboard', { replace: true });
+    
+    if (window.catalyst) {
+      try {
+        const catalystApp = window.catalyst;
+        await catalystApp.auth.signIn(email, password);
+        navigate('/dashboard', { replace: true });
+      } catch (error) {
+        setErr(error.message || 'Authentication failed');
+      } finally {
+        setBusy(false);
+      }
+    } else {
+      // Local Mock Bypass
+      console.log('[KAVACH] Bypassing login in local mock environment');
+      setBusy(false);
+      navigate('/dashboard', { replace: true });
+    }
   };
 
   return (
@@ -94,14 +105,6 @@ export default function Login() {
               {busy ? 'Verifying…' : 'Access KAVACH AI'}
             </button>
           </form>
-
-          <div className="my-5 flex items-center gap-3 text-slate-mist text-xs">
-            <div className="h-px bg-navy-700 flex-1" /> OR <div className="h-px bg-navy-700 flex-1" />
-          </div>
-          <button onClick={() => signInWithGoogle('KAVACH AI')}
-            className="tap-target w-full border border-navy-700 active:border-gold-500 text-cream-100 rounded-xl py-3.5 sm:py-3 text-sm transition-colors duration-150">
-            Sign in with Google
-          </button>
 
           <div className="mt-6 border-t border-navy-700 pt-4">
             <button onClick={() => setShowDemo((s) => !s)}

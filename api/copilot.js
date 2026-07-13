@@ -4,6 +4,7 @@ import { detectIntent, extractEntities, computeConfidence } from './_utils/nlp.j
 import { mapByIds } from './_utils/join.js';
 import { detectLanguage, t } from './_utils/i18n.js';
 import { computeEarlyWarnings } from './_utils/predictive.js';
+import catalyst from 'zcatalyst-sdk-node';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -40,6 +41,24 @@ export default async function handler(req, res) {
     let graphPayload = null;
     let answer = '';
     let extra = {};
+
+    // Zoho Catalyst Zia Services integration: extract keywords & entities from text
+    const isCatalyst = !supabase.auth;
+    if (isCatalyst) {
+      try {
+        const catalystApp = catalyst.initialize();
+        const zia = catalystApp.zia();
+        const ziaResult = await zia.getTextAnalytics([query]);
+        if (ziaResult && ziaResult[0]) {
+          extra.zia_keywords = ziaResult[0].keywords || [];
+          extra.zia_entities = ziaResult[0].entities || [];
+          extra.zia_sentiment = ziaResult[0].sentiment || 'neutral';
+          console.log('[KAVACH ZIA SERVICES] Extracted entities & keywords successfully.');
+        }
+      } catch (ziaErr) {
+        console.warn('[KAVACH ZIA SERVICES] Non-blocking text analytics error:', ziaErr);
+      }
+    }
 
     // Stage 3: Retrieval Orchestrator — builds a scoped, filtered query.
     // RBAC scope (station/district/state-wide) is applied server-side,
@@ -233,6 +252,27 @@ export default async function handler(req, res) {
         answer = L('caseNone');
       } else {
         answer = L('caseFound', records.length) + ' ' + records.slice(0, 5).map((c) => L('caseItem', c)).join('; ') + '.';
+      }
+    }
+
+    // Zoho Catalyst QuickML LLM/RAG integration
+    const endpointKey = process.env.QUICKML_ENDPOINT_KEY;
+    if (endpointKey && isCatalyst) {
+      try {
+        console.log('[KAVACH QUICKML] Calling QuickML endpoint...');
+        const catalystApp = catalyst.initialize();
+        const quickml = catalystApp.quickml();
+        const prediction = await quickml.executeQuickMLEndpoint(endpointKey, {
+          query_text: query,
+          jurisdiction_scope: officer.station_name || officer.district_name || 'state-wide'
+        });
+        if (prediction && (prediction.answer || prediction.output)) {
+          answer = prediction.answer || prediction.output;
+          extra.quickml_prediction = prediction;
+          console.log('[KAVACH QUICKML] Output successfully generated.');
+        }
+      } catch (qmlErr) {
+        console.warn('[KAVACH QUICKML] Falling back to deterministic template:', qmlErr);
       }
     }
 

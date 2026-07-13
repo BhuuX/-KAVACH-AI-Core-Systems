@@ -1,0 +1,8 @@
+{
+  "command": "node api-server.js",
+  "stack": "node18",
+  "memory": 256,
+  "env_variables": {
+    "USE_CATALYST": "true"
+  }
+}

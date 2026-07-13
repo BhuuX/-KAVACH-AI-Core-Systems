@@ -1,0 +1,23 @@
+{
+  "app_sail": {
+    "source": "./",
+    "targets": [
+      "kavach-api"
+    ],
+    "ignore": [
+      "node_modules",
+      "src",
+      "public",
+      ".git",
+      ".vscode",
+      ".gemini"
+    ]
+  },
+  "client": {
+    "source": "dist",
+    "ignore": [
+      "node_modules",
+      ".git"
+    ]
+  }
+}

@@ -1,8 +1,2 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
-
-export default supabase;
+// Supabase client has been completely removed. All services migrated to Zoho Catalyst.
+export default null;

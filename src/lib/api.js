@@ -1,13 +1,9 @@
-import supabase from './supabase';
-
 export async function authFetch(url, options = {}) {
-  const { data: { session } } = await supabase.auth.getSession();
-  const token = session?.access_token;
+  // Under Zoho Catalyst, session cookies and headers are handled natively by AppSail.
   const res = await fetch(url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
   });

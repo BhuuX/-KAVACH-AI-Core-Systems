@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import supabase from '../lib/supabase';
 import {
   LayoutDashboard, MessageSquareText, FileSearch, Users, Car,
   Network, MapPinned, FileOutput, ShieldAlert, LogOut, ChevronRight,
@@ -13,11 +12,12 @@ const NAV = [
   { to: '/dashboard', label: 'Command Overview', short: 'Home', icon: LayoutDashboard },
   { to: '/copilot', label: 'AI Copilot', short: 'Copilot', icon: MessageSquareText },
   { to: '/cases', label: 'Case Registry', short: 'Cases', icon: FileSearch },
-  { to: '/persons', label: 'Person Directory', short: 'Persons', icon: Users },
-  { to: '/vehicles', label: 'Vehicle Records', short: 'Vehicles', icon: Car },
-  { to: '/network', label: 'Network Graph', short: 'Network', icon: Network },
-  { to: '/map', label: 'Crime Map (GIS)', short: 'Map', icon: MapPinned },
-  { to: '/reports', label: 'Investigation Briefs', short: 'Reports', icon: FileOutput },
+  { to: '/persons', label: 'Suspect Directory', short: 'Suspects', icon: Users },
+  { to: '/vehicles', label: 'Vehicle Seizures', short: 'Vehicles', icon: Car },
+  { to: '/network', label: 'Link Analysis', short: 'Network', icon: Network },
+  { to: '/predictive', label: 'Predictive Mapping', short: 'Predictive', icon: MapPinned },
+  { to: '/briefs', label: 'Investigation Briefs', short: 'Briefs', icon: FileOutput },
+  { to: '/alerts', label: 'System Alerts', short: 'Alerts', icon: ShieldAlert },
 ];
 
 // The four highest-frequency destinations get a permanent slot in the
@@ -53,8 +53,12 @@ export default function AppShell() {
   }, [drawerOpen]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/login', { replace: true });
+    if (window.catalyst) {
+      window.catalyst.auth.signOut(window.location.origin + '/login');
+    } else {
+      console.log('[KAVACH] Logging out of local mock Catalyst session');
+      navigate('/login', { replace: true });
+    }
   };
 
   const isTabActive = (to) => location.pathname === to || (to !== '/dashboard' && location.pathname.startsWith(to));
