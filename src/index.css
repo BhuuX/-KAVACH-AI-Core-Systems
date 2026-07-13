@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-navy-950: #040b1a;
+  --color-navy-900: #0a1f44;
+  --color-navy-850: #0d2450;
+  --color-navy-800: #122c5c;
+  --color-navy-700: #1a3a72;
+  --color-navy-600: #254a8a;
+  --color-gold-600: #a8811d;
+  --color-gold-500: #c9a227;
+  --color-gold-400: #d9ba52;
+  --color-gold-300: #e6cd7d;
+  --color-crimson-600: #7f1d24;
+  --color-crimson-500: #a3272f;
+  --color-crimson-400: #c23e46;
+  --color-emerald-500: #2f9e6e;
+  --color-cream-100: #f7f3e8;
+  --color-cream-200: #ede5cf;
+  --color-slate-mist: #93a3c4;
+
+  --font-serif: 'IBM Plex Serif', Georgia, serif;
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-navy-950);
+  color: var(--color-cream-100);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
+}
+
+/* Prevent iOS Safari auto-zoom on input focus (16px minimum) while
+   keeping our smaller design-system sizes everywhere else. */
+input, select, textarea {
+  font-size: 16px;
+}
+@media (min-width: 768px) {
+  input, select, textarea { font-size: inherit; }
+}
+
+button, a, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--color-navy-950); }
+::-webkit-scrollbar-thumb { background: var(--color-navy-700); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-gold-600); }
+
+.kavach-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-navy-700) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hides scrollbar entirely for horizontally-swipeable strips (e.g. mobile
+   tab bars) while preserving native touch/momentum scrolling. */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Safe-area utilities for iOS notch / home-indicator devices */
+.safe-top { padding-top: env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.pb-safe-nav { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+.mb-safe-nav { margin-bottom: calc(64px + env(safe-area-inset-bottom)); }
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(201, 162, 39, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0); }
+}
+.pulse-gold { animation: pulse-ring 2s infinite; }
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+.scan-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent, rgba(201,162,39,0.06), transparent);
+  animation: scan-line 4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes fade-slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-slide-up { animation: fade-slide-up 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes drawer-in {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes scrim-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-drawer-in { animation: drawer-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-sheet-up { animation: sheet-up 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-scrim-in { animation: scrim-in 0.2s ease-out both; }
+
+/* Minimum 44px touch targets on mobile per Apple/Google HIG.
+   Both class names are supported since different components reference
+   either spelling — kept as aliases to guarantee consistent tap targets
+   everywhere in the app. */
+.tap-target, .touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
